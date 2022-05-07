@@ -1,0 +1,24 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<hr />
+{% if project %}
+<img src="{{project.image.url}}" />
+<h2>name: {{project.title}}</h2>
+<p>tags:</p>
+<ul>
+    {% for tag in project.tags.all %}
+        <li>{{tag}}</li>
+    {% endfor %}
+</ul>
+<br>
+<p>reviews:</p>
+<ul>
+    {% for review in project.review_set.all %}
+        <li>{{review}}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<h2>not found</h2>
+{% endif %}
+{% endblock content %}
