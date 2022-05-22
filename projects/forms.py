@@ -5,8 +5,9 @@ class ProjectForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for key, field in  self.fields.items():
-            field.widget.attrs.update({"class": "input"})
+
+        for key, filed in self.fields.items():
+            filed.widget.attrs.update({"class": "input"})
     
     class Meta:
         model = Project
