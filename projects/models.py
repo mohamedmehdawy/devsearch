@@ -1,7 +1,7 @@
-from email.policy import default
 from django.db import models
 from users.models import Profile
 import uuid
+
 # Create your models here.
 
 class Project(models.Model):
@@ -51,3 +51,4 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
