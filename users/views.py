@@ -1,4 +1,3 @@
-import re
 from wsgiref.util import request_uri
 from django.shortcuts import render, redirect
 from .models import Profile
@@ -30,7 +29,8 @@ def loginUser(request):
 
 def logoutUser(request):
     logout(request)
-    return redirect("profiles")
+    messages.error(request, "use logged out!")
+    return redirect("login")
 
 
 def profiles(request):
