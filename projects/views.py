@@ -32,7 +32,6 @@ def createProject(request):
     context = {'form': form}
     return render(request, "projects/project_form.html", context)
 
-print(createProject)
 @login_required
 def updateProject(request, pk):
     project = Project.objects.get(id=pk)

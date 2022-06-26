@@ -4,7 +4,29 @@ from .models import Profile
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
 # Create your views here.
+
+def registerUser(request):
+    form = UserCreationForm()
+    page = "register"
+    context = {
+        "page": page,
+        "form": form
+    }
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+            messages.success(request, "user is created")
+            login(request, user)
+            return redirect("profiles")
+    return render(request, "users/login_register_form.html", context)
+
 
 def loginUser(request):
     if not request.user.is_authenticated:
@@ -25,11 +47,11 @@ def loginUser(request):
     else:
         return redirect("profiles")
 
-    return render(request, "users/login_form.html")
+    return render(request, "users/login_register_form.html")
 
 def logoutUser(request):
     logout(request)
-    messages.error(request, "use logged out!")
+    messages.error(request, "user logged out!")
     return redirect("login")
 
 

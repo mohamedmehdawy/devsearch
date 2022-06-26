@@ -7,10 +7,23 @@
     <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
     {% endfor %}
 </ul>
-{% endif %}<form method="POST">
+{% endif %}
+{% if page == "register" %}
+<form method="POST">
+    {% csrf_token %}
+
+    {{form}}
+    <button type="submit">register</button>
+    <p>you have account? <a href="{% url 'login' %}">login</a></p>
+</form>
+{% else %}
+<form method="POST">
     {% csrf_token %}
     <input type="text" name="username" />
     <input type="password" name="password" />
     <button type="submit">log in</button>
+    <p>you dont have account? <a href="{% url 'register' %}">register</a></p>
+
 </form>
+{% endif %}
 {% endblock %}
