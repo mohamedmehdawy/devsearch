@@ -4,11 +4,11 @@ from .models import Profile
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
+from .forms import CustomCreationForm
 # Create your views here.
 
 def registerUser(request):
-    form = UserCreationForm()
+    form = CustomCreationForm()
     page = "register"
     context = {
         "page": page,
@@ -16,7 +16,7 @@ def registerUser(request):
     }
 
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = CustomCreationForm(request.POST)
 
         if form.is_valid():
             user = form.save(commit=False)
