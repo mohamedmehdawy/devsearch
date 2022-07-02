@@ -1,3 +1,4 @@
+from tkinter import E
 from wsgiref.util import request_uri
 from django.shortcuts import render, redirect
 from .models import Profile
@@ -30,7 +31,6 @@ def registerUser(request):
 
 def loginUser(request):
     if not request.user.is_authenticated:
-
         if request.method == "POST":
             username = request.POST["username"]
             password = request.POST["password"]
@@ -39,7 +39,13 @@ def loginUser(request):
                 user = authenticate(request, username=username, password=password)
                 if user is not None:
                     login(request, user)
-                    return redirect("profiles")
+
+                    # check if have next in query
+                    try:
+                        if request.GET["next"]:
+                            return redirect(request.GET["next"])
+                    except Exception:
+                        return redirect("profiles")
                 else:
                     messages.error(request, "password is incorrect")
             except:
