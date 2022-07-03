@@ -11,10 +11,6 @@ from .forms import CustomCreationForm
 def registerUser(request):
     form = CustomCreationForm()
     page = "register"
-    context = {
-        "page": page,
-        "form": form
-    }
 
     if request.method == "POST":
         form = CustomCreationForm(request.POST)
@@ -26,6 +22,10 @@ def registerUser(request):
             messages.success(request, "user is created")
             login(request, user)
             return redirect("profiles")
+    context = {
+        "page": page,
+        "form": form
+    }
     return render(request, "users/login_register_form.html", context)
 
 
