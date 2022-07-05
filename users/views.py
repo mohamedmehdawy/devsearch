@@ -1,4 +1,3 @@
-from tkinter import E
 from wsgiref.util import request_uri
 from django.shortcuts import render, redirect
 from .models import Profile
@@ -39,7 +38,8 @@ def loginUser(request):
                 user = authenticate(request, username=username, password=password)
                 if user is not None:
                     login(request, user)
-
+                    messages.success(request, f"welcome back {user}")
+                    
                     # check if have next in query
                     try:
                         if request.GET["next"]:
@@ -57,7 +57,7 @@ def loginUser(request):
 
 def logoutUser(request):
     logout(request)
-    messages.error(request, "user logged out!")
+    messages.info(request, "user logged out!")
     return redirect("login")
 
 
