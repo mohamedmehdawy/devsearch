@@ -61,7 +61,11 @@
                         <div class="devSkill">
                             <h4 class="devSkill__title">{{skill.name}}</h4>
                             <p class="devSkill__info">
-                                {{skill.description}}
+                                {% if skill.description|length > 150 %}
+                                    {{skill.description|slice:"150"}}...
+                                {% else %}
+                                    {{skill.description}}
+                                {% endif %}
                             </p>
                         </div>
                         {% endfor %}
@@ -86,8 +90,8 @@
                                         alt="project thumbnail" />
                                     <div class="card__body">
                                         <h3 class="project__title">{{project.title}}</h3>
-                                        <p><a class="project__author"
-                                                href="{% url 'user-profile' profile.id %}">By {{profile}}</a></p>
+                                        <p><a class="project__author" href="{% url 'user-profile' profile.id %}">By
+                                                {{profile}}</a></p>
                                         <p class="project--rating">
                                             <span style="font-weight: bold;">{{project.vote_ratio}}%</span> Postitive
                                             Feedback ({{project.vote_total}} Vote{{project.vote_total|pluralize}})

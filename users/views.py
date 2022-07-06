@@ -3,8 +3,10 @@ from django.shortcuts import render, redirect
 from .models import Profile
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CustomCreationForm
+
 # Create your views here.
 
 def registerUser(request):
@@ -44,7 +46,7 @@ def loginUser(request):
                     try:
                         if request.GET["next"]:
                             return redirect(request.GET["next"])
-                    except Exception:
+                    except :
                         return redirect("profiles")
                 else:
                     messages.error(request, "password is incorrect")
@@ -77,3 +79,15 @@ def userProfile(request, pk):
         "otherSkills": otherSkills
     }
     return render(request, "users/user-profile.html", context)
+
+@login_required
+def userAccount(request):
+    profile = request.user.profile
+    skills = profile.skill_set.all()
+    projects = profile.project_set.all()
+    context = {
+        "profile": profile,
+        "skills": skills,
+        "projects": projects
+    }
+    return render(request, "users/account.html", context)
