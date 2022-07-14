@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomCreationForm
+from .forms import CustomCreationForm, ProfileForm
 
 # Create your views here.
 
@@ -65,7 +65,6 @@ def logoutUser(request):
 
 def profiles(request):
     profiles = Profile.objects.all()
-
     context = {"profiles": profiles}
     return render(request, "users/profiles.html", context)
 
@@ -78,7 +77,7 @@ def userProfile(request, pk):
         "topSkills": topSkills,
         "otherSkills": otherSkills
     }
-    return render(request, "users/user-profile.html", context)
+    return render(request, "users/user_profile.html", context)
 
 @login_required
 def userAccount(request):
@@ -91,3 +90,10 @@ def userAccount(request):
         "projects": projects
     }
     return render(request, "users/account.html", context)
+
+@login_required
+def editAccount(request):
+    profile = request.user.profile
+    form = ProfileForm(instance=profile)
+    context = {"form": form}
+    return render(request, "users/edit_account.html", context)

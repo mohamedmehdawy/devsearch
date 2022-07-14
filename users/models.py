@@ -10,6 +10,8 @@ class Profile(models.Model):
     user = models.OneToOneField(
         User, null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=200, null=True, blank=True)
+    user_name = models.CharField(max_length=200, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     headline = models.CharField(max_length=800, null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
     location = models.CharField(max_length=200, null=True, blank=True)
@@ -25,6 +27,11 @@ class Profile(models.Model):
     def __str__(self):
         return str(self.user.username)
 
+### change current data
+# all_profiles = Profile.objects.all()
+# for profile in all_profiles:
+#     profile.user_name = profile.user.username
+#     profile.save()
 
 class Skill(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True,
