@@ -22,7 +22,7 @@ def registerUser(request):
             user.save()
             messages.success(request, "user is created")
             login(request, user)
-            return redirect("profiles")
+            return redirect("edit-account")
     context = {
         "page": page,
         "form": form
@@ -95,5 +95,12 @@ def userAccount(request):
 def editAccount(request):
     profile = request.user.profile
     form = ProfileForm(instance=profile)
+    for n in form:
+        print(n)
+    if request.method == "POST":
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect("account")
     context = {"form": form}
     return render(request, "users/edit_account.html", context)
