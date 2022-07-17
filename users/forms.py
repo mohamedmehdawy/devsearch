@@ -1,4 +1,3 @@
-from dataclasses import fields
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile
@@ -22,7 +21,6 @@ class CustomCreationForm(UserCreationForm):
 class ProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print(self.__ne__)
         for name, field in self.fields.items():
             field.widget.attrs.update({"class": "input", "placeholder": field.label})
     class Meta:

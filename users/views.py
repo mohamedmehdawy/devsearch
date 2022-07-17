@@ -95,8 +95,6 @@ def userAccount(request):
 def editAccount(request):
     profile = request.user.profile
     form = ProfileForm(instance=profile)
-    for n in form:
-        print(n)
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
