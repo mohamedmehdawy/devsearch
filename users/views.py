@@ -1,3 +1,4 @@
+import profile
 from wsgiref.util import request_uri
 from django.shortcuts import render, redirect
 from .models import Profile
@@ -5,7 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomCreationForm, ProfileForm
+from .forms import CustomCreationForm, ProfileForm, SkillForm
+from . import urls
 
 # Create your views here.
 
@@ -101,4 +103,45 @@ def editAccount(request):
             form.save()
             return redirect("account")
     context = {"form": form}
-    return render(request, "users/edit_account.html", context)
+    return render(request, "users/main_form.html", context)
+
+
+### skill
+@login_required
+def createSkill(request):
+    form = SkillForm()
+    if request.method == "POST":
+        form = SkillForm(request.POST)
+        
+        if form.is_valid():
+            owner = request.user.profile
+            skill = form.save(commit=False)
+            skill.owner = owner
+            skill.save()
+            messages.success(request, "skill is created successfully")
+            return redirect("account")
+    context = {
+        "form": form,
+    }
+    return render(request, "users/main_form.html", context)
+
+@login_required
+def editSkill(request, pk):
+    profile = request.user.profile
+    skill = profile.skill_set.get(id=pk)
+    form = SkillForm(instance=skill)
+    print(form)
+    if request.method == "POST":
+        form = SkillForm(request.POST, instance=skill)
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, "skill is updated successfully")
+            return redirect("account")
+    
+    context = {
+        "form": form,
+        "prev": "account"
+    }
+    
+    return render(request, "users/main_form.html", context)
