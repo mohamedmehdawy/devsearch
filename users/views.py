@@ -145,3 +145,21 @@ def editSkill(request, pk):
     }
     
     return render(request, "users/main_form.html", context)
+
+@login_required
+def deleteSkill(request, pk):
+    profile = request.user.profile
+    skill = profile.skill_set.get(id=pk)
+
+
+    if request.method == "POST":
+        skill.delete()
+        messages.success(request, "skill is deleted successfully")
+        return redirect("account")
+    
+    context = {
+        "object": skill,
+        "prev": "account",
+    }
+
+    return render(request, "delete_object.html", context)

@@ -52,9 +52,10 @@ def updateProject(request, pk):
 def deleteProject(request, pk):
     profile = request.user.profile
     project = profile.project_set.get(id = pk)
-    context = {"object": project}
     if request.method == "POST":
         project.delete()
         return redirect("account")
+    
+    context = {"object": project, "prev": "account"}
 
-    return render(request, "projects/delete_object.html", context)
+    return render(request, "delete_object.html", context)

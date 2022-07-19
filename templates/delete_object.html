@@ -1,9 +1,17 @@
-{% extends 'main.html' %}
-{% block content %}
-<form method="POST">
-    {% csrf_token %}
-    <p>are you sure to delete "{{object}}"?</p>
-    <a href="{% url 'projects' %}">go back</a>
-    <button type="submit">delete</button>
-</form>
+{% extends 'main.html' %} {% block content %}
+<!-- Main Section -->
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <form class="form" method="POST">
+                {% csrf_token %}
+                <!-- Input:Text -->
+                <p>are you sure to delete {{object}} ?</p>
+                <a class="btn btn--sub btn--lg my-md" href="{% if prev %} {% url ''|add:prev %} {% else %} {% url 'profiles' %} {% endif %}">Back</a>
+
+                <input class="btn btn--sub btn--lg my-md" type="submit" value="Delete" />
+            </form>
+        </div>
+    </div>
+</main>
 {% endblock %}
