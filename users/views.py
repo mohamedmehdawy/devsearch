@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CustomCreationForm, ProfileForm, SkillForm
+from django.db.models import Q
 from . import urls
 
 # Create your views here.
@@ -66,8 +67,13 @@ def logoutUser(request):
 
 
 def profiles(request):
-    profiles = Profile.objects.all()
-    context = {"profiles": profiles}
+    search_query = ""
+    if request.GET.get("search_query"):
+        search_query = request.GET.get("search_query")
+    print([Q(username__icontains=search_query) | Q(headline__icontains=search_query) ])
+    profiles = Profile.objects.filter(Q(user_name__icontains=search_query) | Q(headline__icontains=search_query))
+    
+    context = {"profiles": profiles, "search_query": search_query}
     return render(request, "users/profiles.html", context)
 
 def userProfile(request, pk):
@@ -130,7 +136,6 @@ def editSkill(request, pk):
     profile = request.user.profile
     skill = profile.skill_set.get(id=pk)
     form = SkillForm(instance=skill)
-    print(form)
     if request.method == "POST":
         form = SkillForm(request.POST, instance=skill)
         
