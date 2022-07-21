@@ -1,7 +1,7 @@
 import profile
 from wsgiref.util import request_uri
 from django.shortcuts import render, redirect
-from .models import Profile
+from .models import Profile, Skill
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -70,9 +70,10 @@ def profiles(request):
     search_query = ""
     if request.GET.get("search_query"):
         search_query = request.GET.get("search_query")
-    print([Q(username__icontains=search_query) | Q(headline__icontains=search_query) ])
-    profiles = Profile.objects.filter(Q(user_name__icontains=search_query) | Q(headline__icontains=search_query))
-    
+    skills = Skill.objects.filter(name__icontains = search_query)
+    profiles = Profile.objects.distinct().filter(Q(user_name__icontains = search_query) | 
+                                        Q(headline__icontains = search_query) |
+                                        Q(skill__in = skills))
     context = {"profiles": profiles, "search_query": search_query}
     return render(request, "users/profiles.html", context)
 
