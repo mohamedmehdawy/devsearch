@@ -9,12 +9,14 @@ from .utils import searchProjects, paginateProjects
 
 def projects(request):
     search_query, projects = searchProjects(request)
-    paginator, pages, projects = paginateProjects(request, projects, 3)
+    try:
+        pages, projects = paginateProjects(request, projects, 3)
+    except Exception as error:
+        return error.args[0]
 
     context = {
         "projects": projects,
         "search_query": search_query,
-        "paginator": paginator,
         "pages": pages
     }
     return render(request, 'projects/projects.html', context)

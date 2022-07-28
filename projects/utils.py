@@ -13,20 +13,22 @@ def paginateProjects(request, projects, per_page = 3):
         current_page = request.GET.get("page")
 
     paginator = Paginator(projects, per_page)
+    
+    # check current page
     try:
         projects = paginator.page(current_page)
     except PageNotAnInteger:
-        return redirect(f"{reverse('projects')}?page=1")
+        raise Exception(redirect(f"{reverse('projects')}?page=1"))
     except EmptyPage as error:
         if str(error) == "That page number is less than 1":
-            return redirect(f"{reverse('projects')}?page=1")
+            raise Exception(redirect(f"{reverse('projects')}?page=1"))
         else:
             last_page = paginator.num_pages
-            return redirect(f"{reverse('projects')}?page={last_page}")
-
-    start_index = int(current_page) - 4
+            raise Exception(redirect(f"{reverse('projects')}?page={last_page}"))
 
     
+    # custom range
+    start_index = int(current_page) - 4
     if start_index < 1:
         start_index = 1
         
@@ -36,7 +38,7 @@ def paginateProjects(request, projects, per_page = 3):
     
     pages = range(start_index, end_index)
     
-    return paginator, pages, projects
+    return pages, projects
     
 def searchProjects(request) -> tuple[str, list]:
     """
