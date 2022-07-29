@@ -13,22 +13,25 @@ def paginateProfiles(request, profiles, per_page = 3):
     current_page = 1
     if request.GET.get("page"):
         current_page = request.GET.get("page")
-
+    else:
+        raise Exception(redirect(f"{reverse('profiles')}?page=1"))
     paginator = Paginator(profiles, per_page)
+    
+    # check current page
     try:
         profiles = paginator.page(current_page)
     except PageNotAnInteger:
-        return redirect(f"{reverse('profiles')}?page=1")
+        raise Exception(redirect(f"{reverse('profiles')}?page=1"))
     except EmptyPage as error:
         if str(error) == "That page number is less than 1":
-            return redirect(f"{reverse('profiles')}?page=1")
+            raise Exception(redirect(f"{reverse('profiles')}?page=1"))
         else:
             last_page = paginator.num_pages
-            return redirect(f"{reverse('profiles')}?page={last_page}")
-
-    start_index = int(current_page) - 4
+            raise Exception(redirect(f"{reverse('profiles')}?page={last_page}"))
 
     
+    # custom range
+    start_index = int(current_page) - 4
     if start_index < 1:
         start_index = 1
         
@@ -38,7 +41,7 @@ def paginateProfiles(request, profiles, per_page = 3):
     
     pages = range(start_index, end_index)
     
-    return paginator, pages, profiles
+    return pages, profiles
 
 
 def searchProfiles(request) -> tuple[str, list]:

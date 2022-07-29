@@ -11,6 +11,7 @@ from .utils import searchProfiles, paginateProfiles
 
 # Create your views here.
 
+
 def registerUser(request):
     form = CustomCreationForm()
     page = "register"
@@ -39,16 +40,17 @@ def loginUser(request):
             password = request.POST["password"]
             try:
                 user = User.objects.get(username=username)
-                user = authenticate(request, username=username, password=password)
+                user = authenticate(
+                    request, username=username, password=password)
                 if user is not None:
                     login(request, user)
                     messages.success(request, f"welcome back {user}")
-                    
+
                     # check if have next in query
                     try:
                         if request.GET["next"]:
                             return redirect(request.GET["next"])
-                    except :
+                    except:
                         return redirect("profiles")
                 else:
                     messages.error(request, "password is incorrect")
@@ -59,6 +61,7 @@ def loginUser(request):
 
     return render(request, "users/login_register_form.html")
 
+
 def logoutUser(request):
     logout(request)
     messages.info(request, "user logged out!")
@@ -67,21 +70,27 @@ def logoutUser(request):
 
 def profiles(request):
     search_query, profiles = searchProfiles(request)
-    profiles, 
-    
-    context = {"profiles": profiles, "search_query": search_query}
+    try:
+        pages, profiles = paginateProfiles(request, profiles)
+    except Exception as error:
+        return error.args[0]
+
+    context = {"profiles": profiles,
+                "search_query": search_query, "pages": pages}
     return render(request, "users/profiles.html", context)
+
 
 def userProfile(request, pk):
     profile = Profile.objects.get(id=pk)
-    topSkills = profile.skill_set.exclude(description = "")
-    otherSkills = profile.skill_set.filter(description = "")
+    topSkills = profile.skill_set.exclude(description="")
+    otherSkills = profile.skill_set.filter(description="")
     context = {
         "profile": profile,
         "topSkills": topSkills,
         "otherSkills": otherSkills
     }
     return render(request, "users/user_profile.html", context)
+
 
 @login_required
 def userAccount(request):
@@ -94,6 +103,7 @@ def userAccount(request):
         "projects": projects
     }
     return render(request, "users/account.html", context)
+
 
 @login_required
 def editAccount(request):
@@ -108,13 +118,13 @@ def editAccount(request):
     return render(request, "users/main_form.html", context)
 
 
-### skill
+# skill
 @login_required
 def createSkill(request):
     form = SkillForm()
     if request.method == "POST":
         form = SkillForm(request.POST)
-        
+
         if form.is_valid():
             owner = request.user.profile
             skill = form.save(commit=False)
@@ -127,6 +137,7 @@ def createSkill(request):
     }
     return render(request, "users/main_form.html", context)
 
+
 @login_required
 def editSkill(request, pk):
     profile = request.user.profile
@@ -134,30 +145,30 @@ def editSkill(request, pk):
     form = SkillForm(instance=skill)
     if request.method == "POST":
         form = SkillForm(request.POST, instance=skill)
-        
+
         if form.is_valid():
             form.save()
             messages.success(request, "skill is updated successfully")
             return redirect("account")
-    
+
     context = {
         "form": form,
         "prev": "account"
     }
-    
+
     return render(request, "users/main_form.html", context)
+
 
 @login_required
 def deleteSkill(request, pk):
     profile = request.user.profile
     skill = profile.skill_set.get(id=pk)
 
-
     if request.method == "POST":
         skill.delete()
         messages.success(request, "skill is deleted successfully")
         return redirect("account")
-    
+
     context = {
         "object": skill,
         "prev": "account",
