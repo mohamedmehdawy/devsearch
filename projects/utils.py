@@ -11,7 +11,8 @@ def paginateProjects(request, projects, per_page = 3):
     current_page = 1
     if request.GET.get("page"):
         current_page = request.GET.get("page")
-
+    else:
+        raise Exception(redirect(f"{reverse('projects')}?page=1"))
     paginator = Paginator(projects, per_page)
     
     # check current page
