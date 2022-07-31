@@ -71,7 +71,7 @@ def logoutUser(request):
 def profiles(request):
     search_query, profiles = searchProfiles(request)
     try:
-        pages, profiles = paginateProfiles(request, profiles)
+        pages, profiles = paginateProfiles(request, search_query, profiles)
     except Exception as error:
         return error.args[0]
 

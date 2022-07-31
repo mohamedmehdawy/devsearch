@@ -10,7 +10,7 @@ from .utils import searchProjects, paginateProjects
 def projects(request):
     search_query, projects = searchProjects(request)
     try:
-        pages, projects = paginateProjects(request, projects)
+        pages, projects = paginateProjects(request, search_query, projects)
     except Exception as error:
         return error.args[0]
 

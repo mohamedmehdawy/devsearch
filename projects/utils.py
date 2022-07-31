@@ -4,28 +4,27 @@ from django.shortcuts import redirect
 from django.urls import reverse, resolve
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-def paginateProjects(request, projects, per_page = 3):
+def paginateProjects(request, search, projects, per_page = 3):
     """
         this function used to paginate projects
     """
     current_page = 1
+    search_param = 'search_query=' + search + '&'
     if request.GET.get("page"):
         current_page = request.GET.get("page")
-    else:
-        raise Exception(redirect(f"{reverse('projects')}?page=1"))
     paginator = Paginator(projects, per_page)
     
     # check current page
     try:
         projects = paginator.page(current_page)
     except PageNotAnInteger:
-        raise Exception(redirect(f"{reverse('projects')}?page=1"))
+        raise Exception(redirect(f"{reverse('projects')}?{search_param}page=1"))
     except EmptyPage as error:
         if str(error) == "That page number is less than 1":
-            raise Exception(redirect(f"{reverse('projects')}?page=1"))
+            raise Exception(redirect(f"{reverse('projects')}?{search_param}page=1"))
         else:
             last_page = paginator.num_pages
-            raise Exception(redirect(f"{reverse('projects')}?page={last_page}"))
+            raise Exception(redirect(f"{reverse('projects')}?{search_param}page={last_page}"))
 
     
     # custom range
