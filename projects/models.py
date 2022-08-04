@@ -16,11 +16,24 @@ class Project(models.Model):
     vote_total = models.IntegerField(default=0, null=True, blank=True)
     vote_ratio = models.IntegerField(default=0, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-
+    
+    
+    def calcVote(self):
+        reviews = self.review_set.all()
+        up_reviews = reviews.filter(value="up").count()
+        self.vote_total = reviews.count()
+        try:
+            
+            self.vote_ratio = (up_reviews / self.vote_total) * 100
+        except:
+            self.vote_ratio = 0
+        self.save()
 
     def __str__(self):
         return self.title
     
+
+        
     class Meta:
         ordering = ["created"]
 
@@ -57,4 +70,3 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-

@@ -30,12 +30,6 @@ class Profile(models.Model):
     class Meta:
         ordering = ["created"]
 
-### change current data
-# all_profiles = Profile.objects.all()
-# for profile in all_profiles:
-#     profile.user_name = profile.user.username
-#     profile.save()
-
 class Skill(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True,
                             primary_key=True, editable=False)
