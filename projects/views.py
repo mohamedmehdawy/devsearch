@@ -3,7 +3,7 @@ from django.urls import reverse, resolve
 from django.http import HttpResponse
 from .models import Project
 from django.contrib.auth.decorators import login_required
-from .forms import ProjectForm
+from .forms import ProjectForm, ReviewForm
 from .utils import searchProjects, paginateProjects
 # Create your views here.
 
@@ -25,8 +25,18 @@ def projects(request):
 
 def project(request, pk):
     project = Project.objects.get(id=pk)
+    form = ReviewForm()
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.owner = request.user.profile
+            obj.project = project
+            obj.save()
+            return redirect("project", pk=project.id)
     context = {
-        "project": project
+        "project": project,
+        "form": form
     }
     return render(request, 'projects/single-project.html', context)
 
