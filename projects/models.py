@@ -18,12 +18,15 @@ class Project(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     
     
+    @property
+    def reviewers(self):
+        return self.review_set.all().values_list('owner', flat=True)
+    
     def calcVote(self):
         reviews = self.review_set.all()
         up_reviews = reviews.filter(value="up").count()
         self.vote_total = reviews.count()
         try:
-            
             self.vote_ratio = (up_reviews / self.vote_total) * 100
         except:
             self.vote_ratio = 0
@@ -35,7 +38,7 @@ class Project(models.Model):
 
         
     class Meta:
-        ordering = ["created"]
+        ordering = ["-vote_ratio", "-vote_total", "title"]
 
 
 class Review(models.Model):

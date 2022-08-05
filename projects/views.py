@@ -33,6 +33,7 @@ def project(request, pk):
             obj.owner = request.user.profile
             obj.project = project
             obj.save()
+            project.calcVote()
             return redirect("project", pk=project.id)
     context = {
         "project": project,
