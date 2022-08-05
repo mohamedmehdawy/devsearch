@@ -5,6 +5,7 @@ from .models import Project
 from django.contrib.auth.decorators import login_required
 from .forms import ProjectForm, ReviewForm
 from .utils import searchProjects, paginateProjects
+from django.contrib import messages
 # Create your views here.
 
 def projects(request):
@@ -34,6 +35,7 @@ def project(request, pk):
             obj.project = project
             obj.save()
             project.calcVote()
+            messages.success(request, "Your review was successfully submitted")
             return redirect("project", pk=project.id)
     context = {
         "project": project,
