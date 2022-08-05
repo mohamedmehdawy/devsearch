@@ -36,7 +36,7 @@ def registerUser(request):
 def loginUser(request):
     if not request.user.is_authenticated:
         if request.method == "POST":
-            username = request.POST["username"]
+            username = request.POST["username"].lower()
             password = request.POST["password"]
             try:
                 user = User.objects.get(username=username)
