@@ -1,6 +1,6 @@
 from wsgiref.util import request_uri
 from django.shortcuts import render, redirect
-from .models import Profile, Skill
+from .models import Profile, Skill, Message
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -175,3 +175,12 @@ def deleteSkill(request, pk):
     }
 
     return render(request, "delete_object.html", context)
+
+
+@login_required
+def inbox(request):
+    profile = request.user.profile
+    inbox_messages = profile.recipient.all()
+    un_read_count = inbox_messages.filter(is_read=False).count()
+    context = {"inbox_messages": inbox_messages, "un_read_count": un_read_count}
+    return render(request, "users/inbox.html", context)
