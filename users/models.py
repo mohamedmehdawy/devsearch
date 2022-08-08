@@ -54,3 +54,6 @@ class Message(models.Model):
     
     def __str__(self):
         return self.subject
+    
+    class Meta:
+        ordering = ['is_read', '-created', 'subject']

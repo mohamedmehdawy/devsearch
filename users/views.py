@@ -184,3 +184,13 @@ def inbox(request):
     un_read_count = inbox_messages.filter(is_read=False).count()
     context = {"inbox_messages": inbox_messages, "un_read_count": un_read_count}
     return render(request, "users/inbox.html", context)
+
+@login_required
+def messagePage(request, pk):
+    profile = request.user.profile
+    message = profile.recipient.get(id=pk)
+    if not message.is_read:
+        message.is_read = True
+        message.save()
+    context = {"message": message}
+    return render(request, "users/message.html", context)
