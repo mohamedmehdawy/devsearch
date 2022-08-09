@@ -1,11 +1,11 @@
 from wsgiref.util import request_uri
 from django.shortcuts import render, redirect
-from .models import Profile, Skill, Message
+from .models import Profile
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomCreationForm, ProfileForm, SkillForm
+from .forms import CustomCreationForm, ProfileForm, SkillForm, MessageForm
 from django.db.models import Q
 from .utils import searchProfiles, paginateProfiles
 
@@ -182,15 +182,29 @@ def inbox(request):
     profile = request.user.profile
     inbox_messages = profile.recipient.all()
     un_read_count = inbox_messages.filter(is_read=False).count()
-    context = {"inbox_messages": inbox_messages, "un_read_count": un_read_count}
+    context = {"inbox_messages": inbox_messages,
+                "un_read_count": un_read_count}
     return render(request, "users/inbox.html", context)
+
 
 @login_required
 def messagePage(request, pk):
     profile = request.user.profile
     message = profile.recipient.get(id=pk)
-    if not message.is_read:
+    if message.is_read == False:
         message.is_read = True
         message.save()
     context = {"message": message}
     return render(request, "users/message.html", context)
+
+
+def sendMessage(request, pk):
+    recipient = Profile.objects.get(id=pk)
+    form = MessageForm()
+    current_fields = None
+    if request.user:
+        current_fields = form.login_fields
+    else:
+        current_fields = form.anon_fileds
+    context = {"current_fields": current_fields, "recipient": recipient}
+    return render(request, "users/send_message.html", context)
