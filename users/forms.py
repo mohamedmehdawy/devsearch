@@ -52,11 +52,8 @@ class MessageForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        print(dir(self.fields["subject"]))
-        print(self.fields["subject"].to_python)
-        self.login_fields = [self.fields["subject"], self.fields["body"]]
-        self.anon_fileds = [self.fields["name"], self.fields["email"], *self.login_fields]
-        
-        print(self.login_fields)
+        self.login_fields = [self["subject"], self["body"]]
+        self.anon_fileds = [self["name"], self["email"], *self.login_fields]
+
         for name, field in self.fields.items():
             field.widget.attrs.update({"class": "input", "placeholder": field.label})

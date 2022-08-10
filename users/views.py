@@ -200,11 +200,36 @@ def messagePage(request, pk):
 
 def sendMessage(request, pk):
     recipient = Profile.objects.get(id=pk)
+
+    # check if current user is recipient
+    try:
+        if recipient == request.user.profile:
+            return redirect("user-profile", pk=pk)
+    except:
+        pass
+    
+    # create form
     form = MessageForm()
+    
+    # set current fields
     current_fields = None
-    if request.user:
+    if request.user.is_authenticated:
         current_fields = form.login_fields
     else:
         current_fields = form.anon_fileds
+        
+    if request.method == "POST":
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.recipient = recipient
+            if request.user.is_authenticated:
+                sender = request.user.profile
+                message.sender = sender
+                message.name = sender.name
+                message.email = sender.email
+            message.save()
+            messages.success(request, "message sent successfully")
+            return redirect("user-profile", pk=pk)
     context = {"current_fields": current_fields, "recipient": recipient}
     return render(request, "users/send_message.html", context)
