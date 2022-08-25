@@ -34,6 +34,7 @@ def registerUser(request):
 
 
 def loginUser(request):
+    # print(request.cookies)
     if not request.user.is_authenticated:
         if request.method == "POST":
             username = request.POST["username"].lower()

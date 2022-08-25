@@ -1,0 +1,40 @@
+{% extends 'main.html' %}
+{% block custom_style %}
+<style>
+    input:not([type="submit"])
+    {
+        min-width: 24rem;
+        width: 100%;
+        padding: 1.2rem 1.5rem;
+        border-radius: 0.5rem;
+        border: 2px solid var(--color-light);
+        transition: all 0.3s ease-in-out;
+        background-color: var(--color-bg);
+    }
+
+    input:not([type="submit"]):focus
+    {
+        outline: none;
+        border: 2px solid var(--color-main);
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="auth">
+    <div class="card">
+        <div class="auth__header text-center">
+            <h3>Password reset</h3>
+            <p>Forgotten your password? Enter your email address below, and we’ll email instructions for setting a new one.</p>
+        </div>
+
+        <form class="form auth__form" method="POST">
+            {% csrf_token %}
+            {{ form }}
+            <div class="auth__actions">
+                <input class="btn btn--sub btn--lg" type="submit" value="reset" />
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
