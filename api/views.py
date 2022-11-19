@@ -49,5 +49,4 @@ def voteProject(request, pk):
 
 
     serializer = ProjectsSerializer(project, many=False)
-    print(serializer.data)
     return Response(serializer.data)
