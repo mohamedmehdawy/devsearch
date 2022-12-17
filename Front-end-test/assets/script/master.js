@@ -1,3 +1,32 @@
+const token = localStorage.getItem("token");
+
+// redirect
+/**
+ * this function redirect to passed url
+ * @param target - the url target
+ */
+function redirect(target) {
+    window.location = `/${target}.html`;
+}
+// handel login
+function handelLogin() {
+    const login = document.getElementById("login");
+    const logout = document.getElementById("logout");
+
+    // check if token found
+    if(token) {
+        login.remove();
+    } else {
+        logout.remove();
+    }
+
+    // logout click
+    logout.addEventListener("click", (e)=> {
+        e.preventDefault();
+        localStorage.removeItem("token");
+        redirect("pages/login")
+    })
+}
 // get projects
 async function getProjects() {
     const end_point = "http://127.0.0.1:8000/api/projects/";
@@ -25,8 +54,12 @@ function buildProjects(data) {
                     <p>${data[i].description.substring(0, 150)}...</p>
                 </section>
                 <section class="vote">
-                    <button class="up" data-value="up" data-project="${data[i].id}">&#43;</button>
-                    <button class="down" data-value="down" data-project="${data[i].id}">&#8722;</button>
+                    <button class="up" data-value="up" data-project="${
+                        data[i].id
+                    }">&#43;</button>
+                    <button class="down" data-value="down" data-project="${
+                        data[i].id
+                    }">&#8722;</button>
 
                 </section>
             </section>
@@ -39,28 +72,36 @@ function buildProjects(data) {
 function voteEvents() {
     const end_point = "http://127.0.0.1:8000/api/projects/vote/";
     const buttons = document.querySelectorAll(".project .vote button");
-    
-    buttons.forEach(button => {
-        button.addEventListener("click", () => {
+
+    buttons.forEach((button) => {
+        button.addEventListener("click", async () => {
             const project = button.dataset.project;
             const value = button.dataset.value;
-            
-            fetch(`${end_point}${project}/`, {
-                method: "post",
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjcxMDY2NDQ2LCJpYXQiOjE2NzA5ODAwNDYsImp0aSI6IjVjODA2ZGQ1ZmFiMDQ1YmY4OGMwNDgzNzA0NDBiMmM3IiwidXNlcl9pZCI6MX0.uHqIth72_emyK1JfJq7L7gudeZKfHFhUvOQPy05xajQ",
-                },
-                body: JSON.stringify({
-                    value,
-                    body: "test body"
-                })
-            }).then(response => response.json()).then(data => {
-                console.log(data)
-                getProjects();
-            })
-        })
-    })
+            if (token) {
+                const respsone = await fetch(`${end_point}${project}/`, {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        value,
+                        body: "test body",
+                    }),
+                });
+                if (respsone.ok) {
+                    respsone.json().then((data) => {
+                        console.log(data);
+                        getProjects();
+                    });
+                } else {
+                    redirect("pages/login")
+                }
+            } else {
+                redirect("pages/login")
+            }
+        });
+    });
 }
-
+handelLogin();
 getProjects();
