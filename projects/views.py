@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse, resolve
 from django.http import HttpResponse
-from .models import Project
+from .models import Project, Tag
 from django.contrib.auth.decorators import login_required
 from .forms import ProjectForm, ReviewForm
 from .utils import searchProjects, paginateProjects
@@ -49,10 +49,17 @@ def createProject(request):
     form = ProjectForm()
     if request.method == "POST":
         form = ProjectForm(request.POST, request.FILES)
+        tags = request.POST['tags'].replace(' ', '').split(',')
         if(form.is_valid()):
             project = form.save(commit = False)
             project.owner = profile
             project.save()
+            for tag in tags:
+                tag, created = Tag.objects.get_or_create(name=tag)
+                if created:
+                    tag.save()
+                project.tags.add(tag)
+
         return redirect("account")
     context = {'form': form}
     return render(request, "projects/project_form.html", context)
@@ -61,13 +68,24 @@ def createProject(request):
 def updateProject(request, pk):
     profile = request.user.profile
     project = profile.project_set.get(id=pk)
+    tags = project.tags.all().values_list('name', flat=True)
+    tags_str = ''
+    # convert tags from queryset to string
+    for tag in tags:
+        tags_str += tag + ', '
     form = ProjectForm(instance=project)
     if request.method == "POST":
         form = ProjectForm(request.POST, request.FILES, instance=project)
+        tags = request.POST["tags"].replace(' ', '').split(',')
         if(form.is_valid()):
-            form.save()
+            project_obj = form.save(commit=False)
+            for tag in tags:
+                tag, created = Tag.objects.get_or_create(name=tag)
+                if created:
+                    tag.save()
+                project_obj.tags.add(tag)
             return redirect("account")
-    context = {'form': form}
+    context = {'form': form, 'tags': tags_str}
     return render(request, "projects/project_form.html", context)
 
 @login_required

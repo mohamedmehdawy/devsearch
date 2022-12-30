@@ -16,6 +16,11 @@
                         {{field}}
                     </div>
                 {% endfor %}
+                <!-- tags -->
+                <div class="form__field">
+                    <label for="id_tags">Tags</label>
+                    <textarea class="input" name="tags" id="id_tags" placeholder="type your tags">{{ tags }}</textarea>
+                </div>
                 <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
             </form>
         </div>

@@ -6,7 +6,7 @@ class ProjectForm(ModelForm):
     class Meta:
         model = Project
         fields = "__all__"
-        exclude = ["owner"]
+        exclude = ["owner", "tags"]
         widgets = {
             'tags': forms.CheckboxSelectMultiple
         }
