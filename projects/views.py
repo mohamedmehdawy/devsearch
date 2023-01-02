@@ -14,7 +14,6 @@ def projects(request):
         pages, projects = paginateProjects(request, search_query, projects)
     except Exception as error:
         return error.args[0]
-
     context = {
         "projects": projects,
         "search_query": search_query,
@@ -41,7 +40,11 @@ def project(request, pk):
         "project": project,
         "form": form
     }
-    return render(request, 'projects/single-project.html', context)
+    try:
+        
+        return render(request, 'projects/single-project.html', context)
+    except:
+        return redirect('projects')
 
 @login_required
 def createProject(request):

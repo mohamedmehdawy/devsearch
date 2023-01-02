@@ -48,8 +48,8 @@ def searchProjects(request) -> tuple[str, list]:
     if request.GET.get("search_query"):
         search_query = request.GET.get("search_query")
     tags = Tag.objects.filter(name__icontains=search_query)
-    projects = Project.objects.filter(Q(title__icontains=search_query) |
+    projects = Project.objects.filter((Q(title__icontains=search_query) |
                                         Q(owner__user_name__icontains=search_query) |
-                                        Q(tags__in=tags)).distinct()
-    
+                                        Q(tags__in=tags)) &
+                                        ~Q(owner = None)).distinct()
     return search_query, projects
