@@ -1,7 +1,11 @@
 from django.db import models
 from users.models import Profile
 import uuid
-
+# add path to file
+import sys
+sys.path.append("..")
+# import fixexd image
+from utils.fixImage import fixImage
 # Create your models here.
 
 class Project(models.Model):
@@ -9,7 +13,7 @@ class Project(models.Model):
     owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
     title = models.CharField(max_length=2000)
     description = models.TextField(null=True, blank=True)
-    image = models.ImageField(default="default.jpg")
+    image = models.ImageField(null=True, blank=True, default="default.jpg")
     tags = models.ManyToManyField('Tag', blank=True)
     demo_link = models.URLField(max_length=2000, null=True, blank=True)
     source_link = models.URLField(max_length=2000, null=True, blank=True)
@@ -17,7 +21,18 @@ class Project(models.Model):
     vote_ratio = models.IntegerField(default=0, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        fixImage(self, 'image', '/media/default.jpg')
     
+    # def fixImage(self):
+    #     """
+    #         this function fix image if not found
+    #     """
+    #     if not self.image:
+    #         self.image = {}
+    #         self.image['url'] = '/media/default.jpg'
+            
     @property
     def reviewers(self):
         return self.review_set.all().values_list('owner', flat=True)

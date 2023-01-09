@@ -1,6 +1,9 @@
 from django.db import models
 import uuid
 from django.contrib.auth.models import User
+import sys
+sys.path.append("..")
+from utils.fixImage import fixImage
 # Create your models here.
 
 
@@ -23,7 +26,11 @@ class Profile(models.Model):
     social_youtube = models.URLField(max_length=200, null=True, blank=True)
     social_website = models.URLField(max_length=200, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-
+    
+    # fix image if not found
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        fixImage(self, 'profile_image', '/media/profiles/user-default.png')
     def __str__(self):
         return str(self.user.username)
 
