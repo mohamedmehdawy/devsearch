@@ -11,7 +11,7 @@ class Profile(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True,
                             primary_key=True, editable=False)
     user = models.OneToOneField(
-        User, null=True, blank=True, on_delete=models.CASCADE)
+        User, null=True, blank=True, on_delete=models.CASCADE, related_name='user')
     name = models.CharField(max_length=200, null=True, blank=True)
     user_name = models.CharField(max_length=200, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -25,17 +25,35 @@ class Profile(models.Model):
     social_linkedin = models.URLField(max_length=200, null=True, blank=True)
     social_youtube = models.URLField(max_length=200, null=True, blank=True)
     social_website = models.URLField(max_length=200, null=True, blank=True)
+    reviews = models.ManyToManyField(User, blank=True, related_name='reviews')
+    reviews_counter = models.IntegerField(default=0, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     
     # fix image if not found
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        fixImage(self, 'profile_image', '/media/profiles/user-default.png')
+        # fixImage(self, 'profile_image', '/media/profiles/user-default.png')
+
+    def calcReviews(self, request):
+        """
+            this function calc review for user profile
+            parametrs:
+                self: current object
+                request: request object
+        """
+        user = request.user
+        if user.is_authenticated and user != self.user:
+            status = self.reviews.filter(username=user.username).exists()
+            if not status:
+                self.reviews.add(user)
+                self.reviews_counter += 1
+                self.save()
+    
     def __str__(self):
         return str(self.user.username)
 
     class Meta:
-        ordering = ["created"]
+        ordering = ["-reviews_counter"]
 
 class Skill(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True,

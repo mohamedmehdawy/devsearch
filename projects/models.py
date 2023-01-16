@@ -20,18 +20,9 @@ class Project(models.Model):
     vote_total = models.IntegerField(default=0, null=True, blank=True)
     vote_ratio = models.IntegerField(default=0, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         fixImage(self, 'image', '/media/default.jpg')
-    
-    # def fixImage(self):
-    #     """
-    #         this function fix image if not found
-    #     """
-    #     if not self.image:
-    #         self.image = {}
-    #         self.image['url'] = '/media/default.jpg'
             
     @property
     def reviewers(self):

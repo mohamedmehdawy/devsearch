@@ -85,6 +85,8 @@ def userProfile(request, pk):
     profile = Profile.objects.get(id=pk)
     topSkills = profile.skill_set.exclude(description="")
     otherSkills = profile.skill_set.filter(description="")
+    # calc reviews
+    profile.calcReviews(request)
     context = {
         "profile": profile,
         "topSkills": topSkills,
@@ -95,7 +97,7 @@ def userProfile(request, pk):
 
 @login_required
 def userAccount(request):
-    profile = request.user.profile
+    profile = Profile.objects.get(user_name=request.user.username)
     skills = profile.skill_set.all()
     projects = profile.project_set.all()
     context = {
@@ -108,7 +110,7 @@ def userAccount(request):
 
 @login_required
 def editAccount(request):
-    profile = request.user.profile
+    profile =  Profile.objects.get(user_name=request.user.username)
     form = ProfileForm(instance=profile)
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile)
@@ -127,7 +129,7 @@ def createSkill(request):
         form = SkillForm(request.POST)
 
         if form.is_valid():
-            owner = request.user.profile
+            owner =  Profile.objects.get(user_name=request.user.username)
             skill = form.save(commit=False)
             skill.owner = owner
             skill.save()
@@ -141,7 +143,7 @@ def createSkill(request):
 
 @login_required
 def editSkill(request, pk):
-    profile = request.user.profile
+    profile =  Profile.objects.get(user_name=request.user.username)
     skill = profile.skill_set.get(id=pk)
     form = SkillForm(instance=skill)
     if request.method == "POST":
@@ -162,7 +164,7 @@ def editSkill(request, pk):
 
 @login_required
 def deleteSkill(request, pk):
-    profile = request.user.profile
+    profile =  Profile.objects.get(user_name=request.user.username)
     skill = profile.skill_set.get(id=pk)
 
     if request.method == "POST":
@@ -180,7 +182,7 @@ def deleteSkill(request, pk):
 
 @login_required
 def inbox(request):
-    profile = request.user.profile
+    profile =  Profile.objects.get(user_name=request.user.username)
     inbox_messages = profile.recipient.all()
     un_read_count = inbox_messages.filter(is_read=False).count()
     context = {"inbox_messages": inbox_messages,
@@ -190,7 +192,7 @@ def inbox(request):
 
 @login_required
 def messagePage(request, pk):
-    profile = request.user.profile
+    profile =  Profile.objects.get(user_name=request.user.username)
     message = profile.recipient.get(id=pk)
     if message.is_read == False:
         message.is_read = True
@@ -204,7 +206,7 @@ def sendMessage(request, pk):
 
     # check if current user is recipient
     try:
-        if recipient == request.user.profile:
+        if recipient ==  Profile.objects.get(user_name=request.user.username):
             return redirect("user-profile", pk=pk)
     except:
         pass
@@ -225,7 +227,7 @@ def sendMessage(request, pk):
             message = form.save(commit=False)
             message.recipient = recipient
             if request.user.is_authenticated:
-                sender = request.user.profile
+                sender =  Profile.objects.get(user_name=request.user.username)
                 message.sender = sender
                 message.name = sender.name
                 message.email = sender.email
