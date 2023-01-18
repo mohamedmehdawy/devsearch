@@ -23,7 +23,7 @@ class ProfileForm(ModelForm):
     class Meta:
         model = Profile
         fields = "__all__"
-        exclude = ["user"]
+        exclude = ["user", "reviews"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
