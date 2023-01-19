@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse, resolve
-from django.http import HttpResponse
 from .models import Project, Tag
 from django.contrib.auth.decorators import login_required
 from .forms import ProjectForm, ReviewForm
 from .utils import searchProjects, paginateProjects
 from django.contrib import messages
+# add .. path
+import sys
+sys.path.append("..")
+# get profile
+from users.models import Profile
 # Create your views here.
 
 def projects(request):
@@ -30,7 +33,7 @@ def project(request, pk):
         form = ReviewForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.owner = request.user.profile
+            obj.owner = Profile.objects.get(user=request.user)
             obj.project = project
             obj.save()
             project.calcVote()
@@ -48,7 +51,7 @@ def project(request, pk):
 
 @login_required
 def createProject(request):
-    profile = request.user.profile
+    profile = Profile.objects.get(user=request.user)
     form = ProjectForm()
     if request.method == "POST":
         form = ProjectForm(request.POST, request.FILES)
@@ -69,31 +72,33 @@ def createProject(request):
 
 @login_required
 def updateProject(request, pk):
-    profile = request.user.profile
+    profile = Profile.objects.get(user=request.user)
     project = profile.project_set.get(id=pk)
-    tags = project.tags.all().values_list('name', flat=True)
-    tags_str = ''
-    # convert tags from queryset to string
-    for tag in tags:
-        tags_str += tag + ', '
+    tags = project.tags.all()
     form = ProjectForm(instance=project)
     if request.method == "POST":
         form = ProjectForm(request.POST, request.FILES, instance=project)
-        tags = request.POST["tags"].replace(' ', '').split(',')
+        new_tags = filter(None, request.POST["tags"].replace(' ', '').split(','))
+        print(type(new_tags))
         if(form.is_valid()):
             project_obj = form.save(commit=False)
+            # remove tags not found in new tags
             for tag in tags:
+                if not tag.name in new_tags:
+                    project_obj.tags.remove(tag)
+            # add new tags
+            for tag in new_tags:
                 tag, created = Tag.objects.get_or_create(name=tag)
                 if created:
                     tag.save()
                 project_obj.tags.add(tag)
             return redirect("account")
-    context = {'form': form, 'tags': tags_str}
+    context = {'form': form, 'tags': tags}
     return render(request, "projects/project_form.html", context)
 
 @login_required
 def deleteProject(request, pk):
-    profile = request.user.profile
+    profile = Profile.objects.get(user=request.user)
     project = profile.project_set.get(id = pk)
     if request.method == "POST":
         project.delete()

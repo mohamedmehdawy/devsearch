@@ -2,8 +2,8 @@
 {% block content %}
 <!-- Main Section -->
 <main class="formPage my-xl">
-    <div class="content-box">
-        <div class="formWrapper">
+    <section class="content-box">
+        <section class="formWrapper">
             <a class="backButton" href="{% url 'account' %}"><i class="im im-angle-left"></i></a>
             <br>
 
@@ -11,19 +11,26 @@
                 {% csrf_token %}
                 {% for field in form %}
                     <!-- Input:Text -->
-                    <div class="form__field">
+                    <section class="form__field">
                         <label for="id_{{field.name}}">{{field.label}}</label>
                         {{field}}
-                    </div>
+                    </section>
                 {% endfor %}
                 <!-- tags -->
-                <div class="form__field">
+                <!-- tags list -->
+                <section class="form__field">
+                    {% for tag in tags %}
+                    <section class="tag tag--pill tag--main">{{tag.name}} ⨯</section>
+                    {% endfor %}
+                </section>
+                <section class="form__field">
                     <label for="id_tags">Tags</label>
-                    <textarea class="input" name="tags" id="id_tags" placeholder="type your tags">{{ tags }}</textarea>
-                </div>
+                    <textarea class="input" name="tags" id="id_tags" placeholder="type your tags"></textarea>
+                    <input class="btn btn--sub btn--lg  my-md" id="add-tag" type="button" value="Add Tags" />
+                </section>
                 <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
             </form>
-        </div>
-    </div>
+        </section>
+    </section>
 </main>
 {% endblock %}
