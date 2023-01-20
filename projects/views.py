@@ -93,7 +93,7 @@ def updateProject(request, pk):
                     tag.save()
                 project_obj.tags.add(tag)
             return redirect("account")
-    context = {'form': form, 'tags': tags}
+    context = {'form': form, "project": project,'tags': tags}
     return render(request, "projects/project_form.html", context)
 
 @login_required

@@ -1,7 +1,9 @@
 {% extends 'main.html' %}
+{% load static %}
+
 {% block content %}
 <!-- Main Section -->
-<main class="formPage my-xl">
+<main class="formPage my-xl project" data-id="{{project.id}}">
     <section class="content-box">
         <section class="formWrapper">
             <a class="backButton" href="{% url 'account' %}"><i class="im im-angle-left"></i></a>
@@ -18,9 +20,9 @@
                 {% endfor %}
                 <!-- tags -->
                 <!-- tags list -->
-                <section class="form__field">
+                <section class="form__field tags">
                     {% for tag in tags %}
-                    <section class="tag tag--pill tag--main">{{tag.name}} ⨯</section>
+                        <section class="tag tag--pill tag--main">{{tag.name}} ⨯</section>
                     {% endfor %}
                 </section>
                 <section class="form__field">
@@ -33,4 +35,7 @@
         </section>
     </section>
 </main>
+{% endblock %}
+{% block script %}
+<script type="module" src="{% static 'scripts\js\projectTags\projectTags.js' %}"></script>
 {% endblock %}
