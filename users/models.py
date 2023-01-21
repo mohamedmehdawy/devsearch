@@ -29,7 +29,6 @@ class Profile(models.Model):
     reviews = models.ManyToManyField(User, blank=True, related_name='reviews')
     reviews_counter = models.IntegerField(default=0, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-    is_saved = True
     # fix image if not found
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
