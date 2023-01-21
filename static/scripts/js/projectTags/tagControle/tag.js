@@ -11,10 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
  * this class controle add and delete tag
  */
 export class Tag {
-    constructor(tags, input, button, endPoint, project) {
+    constructor(tags, input, button, submit, endPoint, project) {
         this.tags = tags;
         this.input = input;
         this.button = button;
+        this.submit = submit;
         this.endPoint = endPoint;
         this.project = project;
         // init properties
@@ -36,6 +37,8 @@ export class Tag {
         else {
             // remove init element
             this.data.pop();
+            // set handel submit
+            this.handelSubmit();
         }
         this.addButton();
         this.delete();
@@ -90,21 +93,47 @@ export class Tag {
     delete() {
         const tags = this.tags.querySelectorAll(".tag");
         tags.forEach(tag => {
-            tag.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
-                const response = yield fetch(`${this.endPoint.base}/${this.endPoint.delete}/`, {
-                    method: "DELETE",
-                    headers: this.headers,
-                    body: JSON.stringify({
-                        projectId: this.project.dataset.id,
-                        tagId: tag.dataset.id
-                    })
+            if (this.mode == 'create') {
+                tag.addEventListener("click", () => {
+                    for (let i = 0; i < tags.length; i++) {
+                        if (tag.dataset.name == this.data[i].name) {
+                            this.data.splice(i, 1);
+                            break;
+                        }
+                    }
+                    this.render(this.data);
                 });
-                if (response.ok) {
-                    response.json().then(data => {
-                        this.render(data);
+            }
+            else {
+                tag.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                    const response = yield fetch(`${this.endPoint.base}/${this.endPoint.delete}/`, {
+                        method: "DELETE",
+                        headers: this.headers,
+                        body: JSON.stringify({
+                            projectId: this.project.dataset.id,
+                            tagId: tag.dataset.id
+                        })
                     });
-                }
-            }));
+                    if (response.ok) {
+                        response.json().then(data => {
+                            this.render(data);
+                        });
+                    }
+                }));
+            }
+        });
+    }
+    /**
+     * handel submit when code is create
+     */
+    handelSubmit() {
+        this.submit.addEventListener("click", () => {
+            if (this.input.value && this.input.value[this.input.value.length - 1] != ',') {
+                this.input.value += `,${this.data.map(value => value.name).join(',')}`;
+            }
+            else {
+                this.input.value += this.data.map(value => value.name).join(',');
+            }
         });
     }
     /**
@@ -117,7 +146,7 @@ export class Tag {
         this.input.value = "";
         // add each tag to tags
         for (let tag of data) {
-            this.tags.innerHTML += `<section class="tag tag--pill tag--main" data-id='${tag.id}'>${tag.name} ⨯</section>`;
+            this.tags.innerHTML += `<section class="tag tag--pill tag--main" data-id='${tag.id}' data-name='${tag.name}'>${tag.name} ⨯</section>`;
         }
         // call delete to set click events for all tags
         this.delete();

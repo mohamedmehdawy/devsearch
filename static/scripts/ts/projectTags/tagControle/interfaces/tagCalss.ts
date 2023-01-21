@@ -6,6 +6,7 @@ export interface TagClass{
     tags: HTMLElement;
     input: HTMLInputElement;
     button: HTMLElement;
+    submit: HTMLInputElement;
     endPoint: EndPoint;
     project: HTMLElement;
     data?: Data;

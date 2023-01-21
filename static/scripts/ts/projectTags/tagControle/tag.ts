@@ -11,7 +11,7 @@ export class Tag implements TagClass {
     public mode: "create" | "update" = "create";
     public data: Data = [{name: "", id:""}];
     public headers;
-    constructor(public tags: HTMLElement, public input: HTMLInputElement, public button: HTMLElement, public endPoint: EndPoint, public project: HTMLElement) {
+    constructor(public tags: HTMLElement, public input: HTMLInputElement, public button: HTMLElement, public submit: HTMLInputElement,public endPoint: EndPoint, public project: HTMLElement) {
         this.headers = {
             "Content-Type": "application/json",
         }
@@ -27,6 +27,9 @@ export class Tag implements TagClass {
         } else {
             // remove init element
             this.data.pop();
+
+            // set handel submit
+            this.handelSubmit();
         }
         this.addButton();
         this.delete();
@@ -83,36 +86,62 @@ export class Tag implements TagClass {
     delete() {
         const tags = this.tags.querySelectorAll(".tag") as NodeListOf<HTMLElement>
         tags.forEach(tag => {
-            tag.addEventListener("click", async () => {
-                const response = await fetch(`${this.endPoint.base}/${this.endPoint.delete}/`, {
-                    method: "DELETE",
-                    headers: this.headers,
-                    body: JSON.stringify({
-                        projectId: this.project.dataset.id,
-                        tagId: tag.dataset.id
-                    })
-                });
-                if (response.ok) {
-                    response.json().then(data => {
-                        this.render(data);
-                    })
-                }
-            })
+
+            if(this.mode == 'create') {
+                tag.addEventListener("click", () => {
+                    for(let i = 0; i < tags.length; i++) {
+                        if(tag.dataset.name == this.data[i].name) {
+                            this.data.splice(i, 1);
+                            break;
+                        }
+                    }
+                    this.render(this.data)
+                })
+            } else {
+                tag.addEventListener("click", async () => {
+                    const response = await fetch(`${this.endPoint.base}/${this.endPoint.delete}/`, {
+                        method: "DELETE",
+                        headers: this.headers,
+                        body: JSON.stringify({
+                            projectId: this.project.dataset.id,
+                            tagId: tag.dataset.id
+                        })
+                    });
+                    if (response.ok) {
+                        response.json().then(data => {
+                            this.render(data);
+                        })
+                    }
+                })
+            }
+
         })
 
+    }
+    /**
+     * handel submit when code is create
+     */
+    handelSubmit() {
+        this.submit.addEventListener("click", () => {
+            if(this.input.value && this.input.value[this.input.value.length - 1] != ',') {
+                this.input.value += `,${this.data.map(value => value.name).join(',')}`;
+            } else {
+                this.input.value += this.data.map(value => value.name).join(',')
+            }
+        })
     }
     /**
      * this function render tags to layout
      * @param data - the all data
      */
-    render(data: { name: string, id: string }[]) {
+    render(data: Data) {
         // reset tags and input value
         this.tags.innerText = "";
         this.input.value = "";
 
         // add each tag to tags
         for (let tag of data) {
-            this.tags.innerHTML += `<section class="tag tag--pill tag--main" data-id='${tag.id}'>${tag.name} ⨯</section>`
+            this.tags.innerHTML += `<section class="tag tag--pill tag--main" data-id='${tag.id}' data-name='${tag.name}'>${tag.name} ⨯</section>`
         }
         // call delete to set click events for all tags
         this.delete();

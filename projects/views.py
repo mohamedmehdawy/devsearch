@@ -79,13 +79,8 @@ def updateProject(request, pk):
     if request.method == "POST":
         form = ProjectForm(request.POST, request.FILES, instance=project)
         new_tags = filter(None, request.POST["tags"].replace(' ', '').split(','))
-        print(type(new_tags))
         if(form.is_valid()):
             project_obj = form.save(commit=False)
-            # remove tags not found in new tags
-            for tag in tags:
-                if not tag.name in new_tags:
-                    project_obj.tags.remove(tag)
             # add new tags
             for tag in new_tags:
                 tag, created = Tag.objects.get_or_create(name=tag)
