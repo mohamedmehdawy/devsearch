@@ -5,6 +5,11 @@ from .serializers import ProjectsSerializer, TagsSerializer
 from projects.models import Project, Review, Tag
 from projects.forms import ReviewForm
 from users.models import Profile
+# append .. path
+import sys
+sys.path.append("..")
+# get user function
+from utils.getUser import getUser
 
 @api_view(["GET"])
 def getRoutes(request):
@@ -53,10 +58,9 @@ def voteProject(request, pk):
     return Response(serializer.data)
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 def addTags(request):
+    user = Profile.objects.get(user=getUser(request))
     projectId = request.data['projectId']
-    user = Profile.objects.get(user=request.user)
     project = user.project_set.get(id=projectId)
     req_tags = request.data['tags'].replace(' ', '').split(',')
     for tag in req_tags:
@@ -64,4 +68,22 @@ def addTags(request):
         project.tags.add(current_tag)
     tags = project.tags.all()
     serializer = TagsSerializer(tags, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+def deleteTag(request):
+    user = Profile.objects.get(user=getUser(request))
+    projectId = request.data['projectId']
+    project = user.project_set.get(id=projectId)
+    tagId = request.data['tagId']
+    tag = project.tags.get(id=tagId)
+    # remove tag from project and db
+    project.tags.remove(tag)
+    tag.delete()
+    
+    # return tags
+    tags = project.tags.all()
+    serializer = TagsSerializer(tags, many=True)
+    print(serializer.data)
     return Response(serializer.data)

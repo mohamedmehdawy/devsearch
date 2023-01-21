@@ -1,0 +1,1 @@
+export type Data = { name: string, id: string }[];

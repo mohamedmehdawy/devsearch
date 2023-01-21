@@ -22,7 +22,7 @@
                 <!-- tags list -->
                 <section class="form__field tags">
                     {% for tag in tags %}
-                        <section class="tag tag--pill tag--main">{{tag.name}} ⨯</section>
+                        <section class="tag tag--pill tag--main" data-id="{{tag.id}}">{{tag.name}} ⨯</section>
                     {% endfor %}
                 </section>
                 <section class="form__field">

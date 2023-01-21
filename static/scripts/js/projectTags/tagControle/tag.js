@@ -17,14 +17,28 @@ export class Tag {
         this.button = button;
         this.endPoint = endPoint;
         this.project = project;
-        this.data = [{}];
+        // init properties
+        this.mode = "create";
+        this.data = [{ name: "", id: "" }];
+        this.headers = {
+            "Content-Type": "application/json",
+        };
         this.setup();
     }
     /**
      * setup method
      */
     setup() {
+        // set mode to update if id is set
+        if (this.project.dataset.id) {
+            this.mode = "update";
+        }
+        else {
+            // remove init element
+            this.data.pop();
+        }
         this.addButton();
+        this.delete();
     }
     /**
      * call add function when click in button
@@ -39,13 +53,25 @@ export class Tag {
      * @return all tags
      */
     add() {
+        if (this.mode == 'create') {
+            let tags = this.input.value.replace(/\s+/g, '').split(',').map((ele) => {
+                return { name: ele, id: ele };
+            });
+            this.data.push(...tags);
+            this.render(this.data);
+        }
+        else {
+            this.addCall();
+        }
+    }
+    /**
+     * this method send data to server
+     */
+    addCall() {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield fetch(`${this.endPoint.base}/${this.endPoint.add}/`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc0MjQ5MTQ5LCJpYXQiOjE2NzQxNjI3NDksImp0aSI6ImVlZTNmNGY4YjJhMzQwODJiNTRhMmYxOTliMmVhY2FlIiwidXNlcl9pZCI6MX0.JuKZakLsfi7lRBuPgj1auGhXSgjvUow1Wu3Jzn5ArUg"
-                },
+                headers: this.headers,
                 body: JSON.stringify({
                     projectId: this.project.dataset.id,
                     tags: this.input.value,
@@ -53,20 +79,47 @@ export class Tag {
             });
             if (response.ok) {
                 response.json().then(data => {
-                    // reset tags and input value
-                    this.tags.innerText = "";
-                    this.input.value = "";
-                    // add each tag to tags
-                    for (let tag of data) {
-                        this.tags.innerHTML += `<section class="tag tag--pill tag--main">${tag.name} ⨯</section>`;
-                    }
+                    this.render(data);
                 });
             }
         });
     }
     /**
-     * this method remove tag to db
+     * this method remove tag from db and return tags
      */
     delete() {
+        const tags = this.tags.querySelectorAll(".tag");
+        tags.forEach(tag => {
+            tag.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                const response = yield fetch(`${this.endPoint.base}/${this.endPoint.delete}/`, {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        projectId: this.project.dataset.id,
+                        tagId: tag.dataset.id
+                    })
+                });
+                if (response.ok) {
+                    response.json().then(data => {
+                        this.render(data);
+                    });
+                }
+            }));
+        });
+    }
+    /**
+     * this function render tags to layout
+     * @param data - the all data
+     */
+    render(data) {
+        // reset tags and input value
+        this.tags.innerText = "";
+        this.input.value = "";
+        // add each tag to tags
+        for (let tag of data) {
+            this.tags.innerHTML += `<section class="tag tag--pill tag--main" data-id='${tag.id}'>${tag.name} ⨯</section>`;
+        }
+        // call delete to set click events for all tags
+        this.delete();
     }
 }

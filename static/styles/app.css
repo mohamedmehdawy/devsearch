@@ -847,3 +847,12 @@ img {
   margin-bottom: 1rem;
   margin-top: 2rem;
 }
+
+/*=======================
+  tags
+========================*/
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
