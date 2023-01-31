@@ -26,7 +26,7 @@ class Profile(models.Model):
     social_linkedin = models.URLField(max_length=200, null=True, blank=True)
     social_youtube = models.URLField(max_length=200, null=True, blank=True)
     social_website = models.URLField(max_length=200, null=True, blank=True)
-    reviews = models.ManyToManyField('Profile')
+    reviews = models.ManyToManyField(User)
     reviews_counter = models.IntegerField(default=0, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     # fix image if not found
@@ -44,10 +44,10 @@ class Profile(models.Model):
         """
         user = request.user
         if user.is_authenticated and user != self.user:
-            status = self.reviews.filter(user_name=user.username).exists()
+            status = self.reviews.filter(id=user.id).exists()
+            print(status)
             if not status:
-                profile = user.user # because in relation one to one i set related name to user
-                self.reviews.add(profile)
+                self.reviews.add(user)
                 self.reviews_counter += 1
                 self.save()
     
