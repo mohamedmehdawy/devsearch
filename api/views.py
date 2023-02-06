@@ -64,8 +64,9 @@ def addTags(request):
     project = user.project_set.get(id=projectId)
     req_tags = request.data['tags'].replace(' ', '').split(',')
     for tag in req_tags:
-        current_tag, created = Tag.objects.get_or_create(name=tag)
-        project.tags.add(current_tag)
+        if tag:
+            current_tag, created = Tag.objects.get_or_create(name=tag)
+            project.tags.add(current_tag)
     tags = project.tags.all()
     serializer = TagsSerializer(tags, many=True)
     return Response(serializer.data)

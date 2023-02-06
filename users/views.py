@@ -8,7 +8,7 @@ from django.contrib import messages
 from .forms import CustomCreationForm, ProfileForm, SkillForm, MessageForm
 from django.db.models import Q
 from .utils import searchProfiles, paginateProfiles
-
+import os
 # Create your views here.
 
 

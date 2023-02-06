@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -130,11 +131,11 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': 'devsearch',
+        'NAME': os.environ.get("DB_NAME"),
 
-        'USER': 'postgres',
+        'USER': os.environ.get("DB_USER"),
 
-        'PASSWORD': '14629',
+        'PASSWORD': os.environ.get("DB_PASSWORD"),
 
         'HOST': 'localhost',
 
@@ -207,5 +208,5 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "mohammedmehdawy@gmail.com"
-EMAIL_HOST_PASSWORD = "dfdafzjdwovgczoz"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")

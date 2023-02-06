@@ -45,7 +45,6 @@ class Profile(models.Model):
         user = request.user
         if user.is_authenticated and user != self.user:
             status = self.reviews.filter(id=user.id).exists()
-            print(status)
             if not status:
                 self.reviews.add(user)
                 self.reviews_counter += 1
